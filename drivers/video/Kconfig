@@ -969,4 +969,11 @@ config VIDEO_ADV7535
 	Say Y here if you want to enable support for ADI ADV7535
 	DSI to HDMI connector, currently only support 1920x1080.
 
+config VIDEO_LINK
+	bool "Enable video link framework support"
+	depends on DM_VIDEO
+	help
+	   This option enables a video link framework basing on port-endpoint graph
+	   to connect video components.
+
 endmenu
