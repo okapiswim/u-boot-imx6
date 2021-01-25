@@ -374,6 +374,7 @@ static int mxs_video_probe(struct udevice *dev)
 {
 	struct video_uc_platdata *plat = dev_get_uclass_platdata(dev);
 	struct video_priv *uc_priv = dev_get_uclass_priv(dev);
+	struct mxsfb_priv *priv = dev_get_priv(dev);
 
 	struct display_timing timings;
 	u32 bpp = 0;
@@ -460,6 +461,7 @@ static int mxs_video_bind(struct udevice *dev)
 static int mxs_video_remove(struct udevice *dev)
 {
 	struct video_uc_platdata *plat = dev_get_uclass_platdata(dev);
+	struct mxsfb_priv *priv = dev_get_priv(dev);
 
 	mxs_remove_common(plat->base);
 
@@ -482,6 +484,7 @@ U_BOOT_DRIVER(mxs_video) = {
 	.probe	= mxs_video_probe,
 	.remove = mxs_video_remove,
 	.flags	= DM_FLAG_PRE_RELOC | DM_FLAG_OS_PREPARE,
+	.priv_auto_alloc_size	= sizeof(struct mxsfb_priv),
 };
 #endif /* ifndef CONFIG_DM_VIDEO */
 
@@ -502,6 +505,7 @@ void cvt_fb_videomode_to_ctfb_res_modes(const struct fb_videomode *fb, struct ct
 	ct->vmode = fb->vmode;
 }
 
+#ifndef CONFIG_DM_VIDEO
 static struct fb_videomode const *gmode;
 static uint32_t gpixfmt;
 
@@ -567,3 +571,4 @@ void *video_hw_init(void)
 	bpp = video_get_params(&mode, penv);
 	return mxsfb_probe(bpp, &mode);
 }
+#endif
