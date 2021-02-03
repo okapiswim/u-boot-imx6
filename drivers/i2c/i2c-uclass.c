@@ -388,10 +388,13 @@ int dm_i2c_probe(struct udevice *bus, uint chip_addr, uint chip_flags,
 	if (ret)
 		return ret;
 
-	/* The chip was found, see if we have a driver, and probe it */
-	ret = i2c_get_chip(bus, chip_addr, 1, devp);
-	debug("%s:  i2c_get_chip: ret=%d\n", __func__, ret);
-
+	if (chip_flags & DM_I2C_GENERIC) {
+		ret = i2c_bind_driver(bus, chip_addr, 1, devp);
+	} else {
+		/* The chip was found, see if we have a driver, and probe it */
+		ret = i2c_get_chip(bus, chip_addr, 1, devp);
+		debug("%s:  i2c_get_chip: ret=%d\n", __func__, ret);
+	}
 	return ret;
 }
 
