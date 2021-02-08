@@ -9,6 +9,7 @@
 #include <asm/mach-imx/fbpanel.h>
 #include <asm/gpio.h>
 #include <dm.h>
+#include <dm/device-internal.h>
 #include <i2c.h>
 #include <linux/delay.h>
 #include "bd_common.h"
@@ -23,6 +24,11 @@ static int detect_pca9546(struct display_info_t const *di, int sub_bus, int sub_
 	u8 orig_i2c_bus;
 #endif
 
+#ifdef CONFIG_DM_VIDEO
+	if (di->bus_gp) {
+		ret = gpio_request(di->bus_gp, "bus_gp");
+	}
+#endif
 	if (di->bus_gp)
 		gpio_direction_output(di->bus_gp, 1);
 	if (di->enable_gp)
@@ -35,14 +41,14 @@ static int detect_pca9546(struct display_info_t const *di, int sub_bus, int sub_
 		printf("%s: Can't find bus\n", __func__);
 		return 0;
 	}
-	ret = dm_i2c_probe(bus, 0x70, 0x0, &mux);
+	ret = dm_i2c_probe(bus, 0x70, DM_I2C_GENERIC, &mux);
 	if (!ret) {
 		/* write control register, select sub bus */
 		if (sub_bus >= 0)
 			dm_i2c_write(mux, 1 << sub_bus, NULL, 0);
 		if (sub_bus2 >= 0)
 			dm_i2c_write(mux, 1 << sub_bus2, NULL, 0);
-		ret = dm_i2c_probe(bus, di->addr_num, 0x0, &i2c_dev);
+		ret = dm_i2c_probe(bus, di->addr_num, DM_I2C_GENERIC, &i2c_dev);
 	}
 	if (!ret && (reg1 >= 0)) {
 		ret = dm_i2c_reg_write(i2c_dev, reg1, val1);
@@ -57,6 +63,12 @@ static int detect_pca9546(struct display_info_t const *di, int sub_bus, int sub_
 			printf("%s: i2c write reg=0x%x failed(%d)\n",
 				__func__, reg2, ret);
 		}
+	}
+	if (mux) {
+		int ret2 = device_remove(mux, DM_REMOVE_NORMAL);
+
+		if (!ret2)
+			device_unbind(mux);
 	}
 #else
 	orig_i2c_bus = i2c_get_bus_num();
@@ -91,6 +103,12 @@ static int detect_pca9546(struct display_info_t const *di, int sub_bus, int sub_
 		if (di->enable_gp)
 			gpio_direction_input(di->enable_gp);
 	}
+#ifdef CONFIG_DM_VIDEO
+	if (di->bus_gp) {
+		gpio_free(di->bus_gp);
+	}
+
+#endif
 	return (ret == 0);
 }
 
