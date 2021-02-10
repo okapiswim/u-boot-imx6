@@ -15,6 +15,7 @@
 #define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_USE_SECTOR
 #define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR	0x300
 #define CONFIG_SYS_MMCSD_FS_BOOT_PARTITION	1
+#define CONFIG_IMX6_PWM_PER_CLK		66000000
 
 #ifdef CONFIG_SPL_BUILD
 
@@ -124,10 +125,13 @@
 
 
 /* Framebuffer */
-#ifdef CONFIG_VIDEO
-#define CONFIG_VIDEO_BMP_RLE8
-#define CONFIG_BMP_16BPP
+#if defined(CONFIG_VIDEO) || defined(CONFIG_DM_VIDEO)
+#define CONFIG_VIDEO_MXS
 #define CONFIG_VIDEO_LOGO
+#define CONFIG_BMP_16BPP
+#define CONFIG_BMP_24BPP
+#define CONFIG_BMP_32BPP
+#define CONFIG_VIDEO_BMP_RLE8
 #define CONFIG_VIDEO_BMP_LOGO
 #endif
 
@@ -205,6 +209,7 @@
 		"fi;\0" \
 	"net_upgradeu=dhcp " BD_RAM_SCRIPT " net_upgradeu.scr && source " BD_RAM_SCRIPT "\0" \
 	"otg_upgradeu=run usbnetwork; tftp " BD_RAM_SCRIPT " net_upgradeu.scr && source " BD_RAM_SCRIPT "\0" \
+	"splashimage=" __stringify(CONFIG_LOADADDR) "\0" \
 	"upgradeu=setenv boot_scripts upgrade.scr; boot;" \
 		"echo Upgrade failed!; setenv boot_scripts boot.scr\0" \
 	"usbnet_devaddr=00:19:b8:00:00:02\0" \
