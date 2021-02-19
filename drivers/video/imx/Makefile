@@ -5,6 +5,7 @@
 
 obj-$(CONFIG_VIDEO_IPUV3) += mxc_ipuv3_fb.o ipu_common.o ipu_disp.o
 
+
 UBOOTINCLUDE += -I$(srctree)/drivers/video/imx/hdp
 obj-$(CONFIG_VIDEO_IMX_HDP_LOAD) += hdp_load.o hdp/
 obj-$(CONFIG_VIDEO_IMX8_HDMI) += hdp.o imx8_hdmi.o hdp/
@@ -12,3 +13,4 @@ obj-$(CONFIG_VIDEO_IMXDPUV1) += imxdpuv1.o
 obj-$(CONFIG_VIDEO_SEC_MIPI_DSI) += sec_mipi_dsim.o
 obj-$(CONFIG_VIDEO_IMX_SEC_DSI) += sec_dsim_imx.o
 obj-$(CONFIG_VIDEO_IMX_NW_DSI) += nw_dsi_imx.o
+obj-$(CONFIG_VIDEO_NWL_MIPI_DSI) += nwl-drv.o nwl-dsi.o
